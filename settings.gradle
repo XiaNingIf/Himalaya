@@ -1,2 +1,3 @@
+include ':magicindicator'
 include ':app'
 rootProject.name = "Himalaya"
