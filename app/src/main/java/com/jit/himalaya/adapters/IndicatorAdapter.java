@@ -19,6 +19,7 @@ public class IndicatorAdapter extends CommonNavigatorAdapter {
 
     private static final String TAG = "IndicatorAdapter";
     private final String[] mTitle;
+    private OnIndicatorTapClickListener mOnTapClickListener;
 
     public IndicatorAdapter(Context context) {
         mTitle = context.getResources().getStringArray(R.array.indicator_title);
@@ -43,21 +44,12 @@ public class IndicatorAdapter extends CommonNavigatorAdapter {
         colorTransitionPagerTitleView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //TODO:
+                if (mOnTapClickListener != null) {
+                    mOnTapClickListener.onTabClick(index);
+                }
             }
         });
         return colorTransitionPagerTitleView;
-        //        SimplePagerTitleView simplePagerTitleView = new ColorTransitionPagerTitleView(context);
-        //        simplePagerTitleView.setNormalColor(Color.GRAY);
-        //        simplePagerTitleView.setSelectedColor(Color.WHITE);
-        //        simplePagerTitleView.setText(mTitle[index]);
-        //        simplePagerTitleView.setOnClickListener(new View.OnClickListener() {
-        //            @Override
-        //            public void onClick(View v) {
-        ////                mViewPager.setCurrentItem(index);
-        //            }
-        //        });
-        //        return simplePagerTitleView;
     }
 
     @Override
@@ -66,5 +58,13 @@ public class IndicatorAdapter extends CommonNavigatorAdapter {
         linePagerIndicator.setMode(LinePagerIndicator.MODE_WRAP_CONTENT);
         linePagerIndicator.setColors(Color.parseColor("#ffffff"));
         return linePagerIndicator;
+    }
+
+    public void setOnIndicatorTapClickListener(OnIndicatorTapClickListener listener){
+        this.mOnTapClickListener = listener;
+    }
+
+    public interface OnIndicatorTapClickListener{
+        void onTabClick(int index);
     }
 }
