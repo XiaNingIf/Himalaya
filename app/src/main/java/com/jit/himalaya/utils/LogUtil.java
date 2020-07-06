@@ -24,25 +24,25 @@ public class LogUtil {
 
     public static void v(String TAG, String content) {
         if (!sIsRelease) {
-            Log.d("[" + sTAG + "]" + TAG, content);
+            Log.v("[" + sTAG + "]" + TAG, content);
         }
     }
 
     public static void i(String TAG, String content) {
         if (!sIsRelease) {
-            Log.d("[" + sTAG + "]" + TAG, content);
+            Log.i("[" + sTAG + "]" + TAG, content);
         }
     }
 
     public static void w(String TAG, String content) {
         if (!sIsRelease) {
-            Log.d("[" + sTAG + "]" + TAG, content);
+            Log.w("[" + sTAG + "]" + TAG, content);
         }
     }
 
     public static void e(String TAG, String content) {
         if (!sIsRelease) {
-            Log.d("[" + sTAG + "]" + TAG, content);
+            Log.e("[" + sTAG + "]" + TAG, content);
         }
     }
 }
