@@ -5,6 +5,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.jit.himalaya.R;
+import com.jit.himalaya.base.BaseFragment;
 
 public class HistoryFragment extends BaseFragment {
 

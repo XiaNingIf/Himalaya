@@ -1,6 +1,6 @@
 package com.jit.himalaya.utils;
 
-import com.jit.himalaya.fragments.BaseFragment;
+import com.jit.himalaya.base.BaseFragment;
 import com.jit.himalaya.fragments.HistoryFragment;
 import com.jit.himalaya.fragments.RecommendFragment;
 import com.jit.himalaya.fragments.SubscriptionFragment;

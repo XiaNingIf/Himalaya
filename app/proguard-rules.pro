@@ -38,3 +38,5 @@
 -dontwarn com.ximalaya.ting.android.opensdk.**
 -keep interface com.ximalaya.ting.android.opensdk.** {*;}
 -keep class com.ximalaya.ting.android.opensdk.** { *; }
+
+-dontwarn com.squareup.okhttp.**

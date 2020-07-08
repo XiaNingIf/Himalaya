@@ -41,15 +41,6 @@ public class RecommendPresenter implements IRecommendPresenter {
         getRecommendData();
     }
 
-    @Override
-    public void pullToRefreshMore() {
-
-    }
-
-    @Override
-    public void loadMore() {
-
-    }
 
     @Override
     public void registerViewCallback(IRecommendViewCallback callback) {
@@ -65,15 +56,26 @@ public class RecommendPresenter implements IRecommendPresenter {
         }
     }
 
+    @Override
+    public void pullToRefreshMore() {
+
+    }
+
+    @Override
+    public void loadMore() {
+
+    }
+
     /**
      * 获取推荐内容，其实就是猜你喜欢
      * 这个接口：3.10.6 获取猜你喜欢专辑
      */
     private void getRecommendData() {
+        updateLoading();
         //封装参数
         Map<String, String> map = new HashMap<>();
         //这个参数表示一页数据返回多少条
-        map.put(DTransferConstants.LIKE_COUNT, Constants.Recommend_Count+"");
+        map.put(DTransferConstants.LIKE_COUNT, Constants.COUNT_RECOMMEND +"");
         CommonRequest.getGuessLikeAlbum(map, new IDataCallBack<GussLikeAlbumList>() {
             @Override
             public void onSuccess(GussLikeAlbumList gussLikeAlbumList) {
@@ -93,17 +95,41 @@ public class RecommendPresenter implements IRecommendPresenter {
                 //数据获取失败
                 LogUtil.d(TAG,"error code ---->" + i);
                 LogUtil.d(TAG,"error Message ---> "+s);
+                handleError();
             }
         });
     }
 
-    private void handlerRecommendResult(List<Album> albumList) {
-        //通知UI
+    private  void updateLoading(){
+        for (IRecommendViewCallback callback : mCallbacks){
+            callback.onLoading();
+        }
+    }
+
+    private void handleError() {
         if(mCallbacks != null){
             for(IRecommendViewCallback callback:mCallbacks){
-                callback.onRecommendListLoaded(albumList);
+                callback.onNetworkError();
             }
         }
+    }
+
+    private void handlerRecommendResult(List<Album> albumList) {
+        if (albumList != null) {
+            if(albumList.size()==0){
+                for (IRecommendViewCallback callback:mCallbacks){
+                    callback.onEmpty();
+                }
+            }else{
+                //通知UI
+                if(mCallbacks != null){
+                    for(IRecommendViewCallback callback:mCallbacks){
+                        callback.onRecommendListLoaded(albumList);
+                    }
+                }
+            }
+        }
+
     }
 
 }

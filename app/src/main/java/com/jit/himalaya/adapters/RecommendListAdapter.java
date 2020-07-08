@@ -12,7 +12,6 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.jit.himalaya.R;
-import com.squareup.picasso.Picasso;
 import com.ximalaya.ting.android.opensdk.model.album.Album;
 
 import java.util.ArrayList;
@@ -20,6 +19,7 @@ import java.util.List;
 
 public class RecommendListAdapter extends RecyclerView.Adapter<RecommendListAdapter.InnerHolder> {
     private  List<Album> mData = new ArrayList<>();
+    private OnRecommendClickListener mItemClickListener = null;
 
     @NonNull
     @Override
@@ -29,8 +29,17 @@ public class RecommendListAdapter extends RecyclerView.Adapter<RecommendListAdap
     }
 
     @Override
-    public void onBindViewHolder(@NonNull InnerHolder holder, int position) {
+    public void onBindViewHolder(@NonNull InnerHolder holder, final int position) {
         holder.itemView.setTag(position);
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(mItemClickListener!=null){
+                    int clickPosition = (int) v.getTag();
+                    mItemClickListener.onItemClick(clickPosition,mData.get(position));
+                }
+            }
+        });
         holder.setData(mData.get(position));
     }
 
@@ -81,5 +90,13 @@ public class RecommendListAdapter extends RecyclerView.Adapter<RecommendListAdap
 //                albumCoverIv.setImageResource(R.mipmap.ximalay_logo);
 //            }
         }
+    }
+
+    public void setOnRecommendClickListener(OnRecommendClickListener listener){
+        this.mItemClickListener = listener;
+    }
+
+    public interface OnRecommendClickListener{
+        void onItemClick(int position, Album album);
     }
 }
