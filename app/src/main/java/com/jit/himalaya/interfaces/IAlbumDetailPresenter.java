@@ -1,6 +1,8 @@
 package com.jit.himalaya.interfaces;
 
-public interface IAlbumDetailPresenter {
+import com.jit.himalaya.base.IBasePresenter;
+
+public interface IAlbumDetailPresenter extends IBasePresenter<IAlbumDetailViewCallback> {
     /**
      * 下拉刷新更多的内容
      */
@@ -18,8 +20,4 @@ public interface IAlbumDetailPresenter {
      * @param page
      */
     void getAlbumDetail(int albumId,int page);
-
-    void registerViewCallback(IAlbumDetailViewCallback detailViewCallback);
-
-    void unRegisterViewCallback(IAlbumDetailViewCallback detailViewCallback);
 }

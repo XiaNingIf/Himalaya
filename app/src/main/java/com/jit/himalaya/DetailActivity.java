@@ -2,7 +2,6 @@ package com.jit.himalaya;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -12,7 +11,6 @@ import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,9 +21,9 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.jit.himalaya.adapters.DetailListAdapter;
 import com.jit.himalaya.base.BaseActivity;
-import com.jit.himalaya.base.BaseApplication;
 import com.jit.himalaya.interfaces.IAlbumDetailViewCallback;
 import com.jit.himalaya.presenters.AlbumDetailPresenter;
+import com.jit.himalaya.presenters.PlayerPresenter;
 import com.jit.himalaya.utils.ImageBlur;
 import com.jit.himalaya.utils.LogUtil;
 import com.jit.himalaya.views.RoundRectImageView;
@@ -39,7 +37,7 @@ import net.lucode.hackware.magicindicator.buildins.UIUtil;
 
 import java.util.List;
 
-public class DetailActivity extends BaseActivity implements IAlbumDetailViewCallback, UILoader.OnRetryClickListener, DetailListAdapter.ItemClickListener {
+public class DetailActivity extends BaseActivity implements UILoader.OnRetryClickListener, DetailListAdapter.ItemClickListener, IAlbumDetailViewCallback {
 
     private static final String TAG = "DetailActivity";
     private ImageView mLargeCover;
@@ -69,7 +67,7 @@ public class DetailActivity extends BaseActivity implements IAlbumDetailViewCall
 
     private void initView() {
         mDetailListContainer = this.findViewById(R.id.detail_list_container);
-        //
+
         if (mUiLoader == null){
             mUiLoader = new UILoader(this) {
                 @Override
@@ -192,7 +190,10 @@ public class DetailActivity extends BaseActivity implements IAlbumDetailViewCall
     }
 
     @Override
-    public void onItemClick() {
+    public void onItemClick(List<Track> detailData, int position) {
+        //设置播放器的数据
+        PlayerPresenter playerPresenter = PlayerPresenter.getPlayerPresenter();
+        playerPresenter.setPlayerList(detailData,position);
         Intent intent = new Intent(this,PlayerActivity.class);
         startActivity(intent);
     }
