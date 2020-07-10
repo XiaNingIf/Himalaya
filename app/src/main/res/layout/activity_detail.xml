@@ -38,23 +38,33 @@
         android:layout_height="40dp"
         android:background="#EBEBEB"
         >
-        <ImageView
-            android:id="@+id/detail_play_control"
-            android:layout_width="20dp"
-            android:layout_height="20dp"
-            android:layout_centerVertical="true"
-            android:layout_marginLeft="10dp"
-            android:src="@mipmap/play_normal"
-            />
-
-        <TextView
-            android:layout_centerVertical="true"
-            android:layout_toRightOf="@id/detail_play_control"
+        <LinearLayout
+            android:id="@+id/detail_play_control_container"
+            android:orientation="horizontal"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="14sp"
-            android:layout_marginLeft="12dp"
-            android:text="继续播放"/>
+            android:layout_centerVertical="true">
+
+            <ImageView
+                android:id="@+id/detail_play_control"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_marginLeft="10dp"
+                android:src="@drawable/selector_play_control_play"
+                />
+
+            <TextView
+                android:id="@+id/detail_play_control_tv"
+                android:layout_centerVertical="true"
+                android:layout_toRightOf="@id/detail_play_control"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="14sp"
+                android:layout_marginLeft="12dp"
+                android:text="继续播放"/>
+
+        </LinearLayout>
+
 
         <TextView
             android:layout_width="wrap_content"

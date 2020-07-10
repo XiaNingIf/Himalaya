@@ -22,6 +22,7 @@ import com.bumptech.glide.Glide;
 import com.jit.himalaya.adapters.DetailListAdapter;
 import com.jit.himalaya.base.BaseActivity;
 import com.jit.himalaya.interfaces.IAlbumDetailViewCallback;
+import com.jit.himalaya.interfaces.IPlayerCallback;
 import com.jit.himalaya.presenters.AlbumDetailPresenter;
 import com.jit.himalaya.presenters.PlayerPresenter;
 import com.jit.himalaya.utils.ImageBlur;
@@ -32,12 +33,13 @@ import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 import com.ximalaya.ting.android.opensdk.model.album.Album;
 import com.ximalaya.ting.android.opensdk.model.track.Track;
+import com.ximalaya.ting.android.opensdk.player.service.XmPlayListControl;
 
 import net.lucode.hackware.magicindicator.buildins.UIUtil;
 
 import java.util.List;
 
-public class DetailActivity extends BaseActivity implements UILoader.OnRetryClickListener, DetailListAdapter.ItemClickListener, IAlbumDetailViewCallback {
+public class DetailActivity extends BaseActivity implements UILoader.OnRetryClickListener, DetailListAdapter.ItemClickListener, IAlbumDetailViewCallback, IPlayerCallback {
 
     private static final String TAG = "DetailActivity";
     private ImageView mLargeCover;
@@ -51,6 +53,10 @@ public class DetailActivity extends BaseActivity implements UILoader.OnRetryClic
     private FrameLayout mDetailListContainer;
     private UILoader mUiLoader;
     private long mCurrentId = -1;
+    private ImageView mPlayControlBtn;
+    private TextView mPlayControlTips;
+    private PlayerPresenter mPlayerPresenter;
+    private View mPlayControlContainerBtn;
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
@@ -61,8 +67,33 @@ public class DetailActivity extends BaseActivity implements UILoader.OnRetryClic
         getWindow().setStatusBarColor(Color.TRANSPARENT);
 
         initView();
+        //专辑详情的presenter
         mAlbumDetailPresenter = AlbumDetailPresenter.getInstance();
         mAlbumDetailPresenter.registerViewCallback(this);
+        //播放器的presenter
+        mPlayerPresenter = PlayerPresenter.getPlayerPresenter();
+        mPlayerPresenter.registerViewCallback(this);
+        updatePlayState(mPlayerPresenter.isPlaying());
+        initListener();
+    }
+
+
+
+    private void initListener() {
+        if (mPlayControlContainerBtn != null) {
+            mPlayControlContainerBtn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    //控制播放器的状态
+                    if (mPlayerPresenter.isPlaying()) {
+                        //正在播放那么久暂停
+                        mPlayerPresenter.pause();
+                    }else{
+                        mPlayerPresenter.play();
+                    }
+                }
+            });
+        }
     }
 
     private void initView() {
@@ -84,7 +115,9 @@ public class DetailActivity extends BaseActivity implements UILoader.OnRetryClic
         mSmallCover = this.findViewById(R.id.viv_small_cover);
         mAlbumTitle = this.findViewById(R.id.tv_album_title);
         mAlbumAuthor = this.findViewById(R.id.tv_album_author);
-
+        mPlayControlBtn = this.findViewById(R.id.detail_play_control);
+        mPlayControlTips = this.findViewById(R.id.detail_play_control_tv);
+        mPlayControlContainerBtn = this.findViewById(R.id.detail_play_control_container);
     }
 
     private View createSuccessView(ViewGroup container) {
@@ -195,6 +228,82 @@ public class DetailActivity extends BaseActivity implements UILoader.OnRetryClic
         PlayerPresenter playerPresenter = PlayerPresenter.getPlayerPresenter();
         playerPresenter.setPlayerList(detailData,position);
         Intent intent = new Intent(this,PlayerActivity.class);
+        LogUtil.e(TAG,"onItemClick");
         startActivity(intent);
+    }
+
+    @Override
+    public void onPlayStart() {
+        //修改图标为暂停的，文字修改为正在播放
+
+    }
+
+    @Override
+    public void onPlayPause() {
+        //设置成播放状态
+        updatePlayState(false);
+    }
+
+    private void updatePlayState(boolean playing) {
+        if (mPlayControlBtn != null && mPlayControlTips != null) {
+            mPlayControlBtn.setImageResource(playing?R.drawable.selector_play_control_play:R.drawable.selector_play_control_play);
+            mPlayControlTips.setText(playing?R.string.playing_tips_text:R.string.pause_tips_text);
+        }
+    }
+
+    @Override
+    public void onPlayStop() {
+        //设置成播放状态
+        updatePlayState(false);
+    }
+
+    @Override
+    public void onPlayError() {
+
+    }
+
+    @Override
+    public void nextPlay(Track track) {
+
+    }
+
+    @Override
+    public void onPrePlay(Track track) {
+
+    }
+
+    @Override
+    public void onListLoaded(List<Track> list) {
+
+    }
+
+    @Override
+    public void onPlayModeChange(XmPlayListControl.PlayMode playMode) {
+
+    }
+
+    @Override
+    public void onProgressChange(int currentProgress, int total) {
+
+    }
+
+    @Override
+    public void onAdLoading() {
+
+    }
+
+    @Override
+    public void onAdFinished() {
+
+    }
+
+    @Override
+    public void onTrackUpdate(Track track, int playIndex) {
+
+    }
+
+    @Override
+    public void updateListOrder(boolean isReverse) {
+
     }
 }
