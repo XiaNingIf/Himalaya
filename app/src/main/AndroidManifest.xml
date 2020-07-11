@@ -9,7 +9,6 @@
     <uses-permission android:name="android.permission.READ_PHONE_STATE" /> <!-- target >=28 需要设置此权限 -->
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
 
-
     <application
         android:name=".base.BaseApplication"
         android:allowBackup="true"
@@ -19,11 +18,15 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
-        <activity android:name=".PlayerActivity"
-            android:screenOrientation="portrait"></activity>
-        <activity android:name=".DetailActivity"
-            android:screenOrientation="portrait"></activity>
-        <activity android:name=".MainActivity"
+        <activity android:name=".SearchActivity"></activity>
+        <activity
+            android:name=".PlayerActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".DetailActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".MainActivity"
             android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -31,9 +34,10 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
         <service
             android:name="com.ximalaya.ting.android.opensdk.player.service.XmPlayerService"
-            android:process=":player"/>
+            android:process=":player" />
     </application>
 
 </manifest>

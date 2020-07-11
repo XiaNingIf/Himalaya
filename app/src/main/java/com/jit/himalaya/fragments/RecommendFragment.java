@@ -12,23 +12,24 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.jit.himalaya.DetailActivity;
 import com.jit.himalaya.R;
-import com.jit.himalaya.adapters.RecommendListAdapter;
+import com.jit.himalaya.adapters.AlbumListAdapter;
 import com.jit.himalaya.base.BaseFragment;
 import com.jit.himalaya.interfaces.IRecommendViewCallback;
 import com.jit.himalaya.presenters.AlbumDetailPresenter;
 import com.jit.himalaya.presenters.RecommendPresenter;
 import com.jit.himalaya.views.UILoader;
+import com.lcodecore.tkrefreshlayout.TwinklingRefreshLayout;
 import com.ximalaya.ting.android.opensdk.model.album.Album;
 
 import net.lucode.hackware.magicindicator.buildins.UIUtil;
 
 import java.util.List;
 
-public class RecommendFragment extends BaseFragment implements IRecommendViewCallback, UILoader.OnRetryClickListener, RecommendListAdapter.OnRecommendClickListener {
+public class RecommendFragment extends BaseFragment implements IRecommendViewCallback, UILoader.OnRetryClickListener, AlbumListAdapter.OnRecommendClickListener {
     private static final String TAG = "RecommendFragment";
     private View mRootView;
     private RecyclerView mRecommendView;
-    private RecommendListAdapter mRecommendListAdapter;
+    private AlbumListAdapter mRecommendListAdapter;
     private RecommendPresenter mRecommendPresenter;
     private UILoader mUILoader;
 
@@ -64,6 +65,8 @@ public class RecommendFragment extends BaseFragment implements IRecommendViewCal
         mRootView = layoutInflater.inflate((R.layout.fragment_recommend), container,false);
 
         mRecommendView = mRootView.findViewById(R.id.recommend_list);
+        TwinklingRefreshLayout twinklingRefreshLayout = mRootView.findViewById(R.id.over_scroll_view);
+        twinklingRefreshLayout.setPureScrollModeOn();
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
         linearLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
         mRecommendView.setLayoutManager(linearLayoutManager);
@@ -76,7 +79,7 @@ public class RecommendFragment extends BaseFragment implements IRecommendViewCal
                 outRect.right = UIUtil.dip2px(view.getContext(),5);
             }
         });
-        mRecommendListAdapter = new RecommendListAdapter();
+        mRecommendListAdapter = new AlbumListAdapter();
         mRecommendView.setAdapter(mRecommendListAdapter);
         mRecommendListAdapter.setOnRecommendClickListener(this);
         return mRootView;

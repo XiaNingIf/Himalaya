@@ -11,6 +11,7 @@ import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,6 +22,7 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.jit.himalaya.adapters.DetailListAdapter;
 import com.jit.himalaya.base.BaseActivity;
+import com.jit.himalaya.base.BaseApplication;
 import com.jit.himalaya.interfaces.IAlbumDetailViewCallback;
 import com.jit.himalaya.interfaces.IPlayerCallback;
 import com.jit.himalaya.presenters.AlbumDetailPresenter;
@@ -29,6 +31,9 @@ import com.jit.himalaya.utils.ImageBlur;
 import com.jit.himalaya.utils.LogUtil;
 import com.jit.himalaya.views.RoundRectImageView;
 import com.jit.himalaya.views.UILoader;
+import com.lcodecore.tkrefreshlayout.RefreshListenerAdapter;
+import com.lcodecore.tkrefreshlayout.TwinklingRefreshLayout;
+import com.lcodecore.tkrefreshlayout.header.bezierlayout.BezierLayout;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 import com.ximalaya.ting.android.opensdk.model.album.Album;
@@ -56,7 +61,11 @@ public class DetailActivity extends BaseActivity implements UILoader.OnRetryClic
     private ImageView mPlayControlBtn;
     private TextView mPlayControlTips;
     private PlayerPresenter mPlayerPresenter;
-    private View mPlayControlContainerBtn;
+    private List<Track> mCurrentTrack = null;
+    private final static int DEFAULT_PLAY_POSITION = 0;
+    private TwinklingRefreshLayout mRefreshLayout;
+    private boolean mIsLoaderMore = false;
+    private String mCurrentTrackTitle;
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
@@ -77,22 +86,48 @@ public class DetailActivity extends BaseActivity implements UILoader.OnRetryClic
         initListener();
     }
 
-
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (mAlbumDetailPresenter != null) {
+            mAlbumDetailPresenter.unRegisterViewCallback(this);
+        }
+        if (mPlayerPresenter != null) {
+            mPlayerPresenter.unRegisterViewCallback(this);
+        }
+    }
 
     private void initListener() {
-        if (mPlayControlContainerBtn != null) {
-            mPlayControlContainerBtn.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    //控制播放器的状态
-                    if (mPlayerPresenter.isPlaying()) {
-                        //正在播放那么久暂停
-                        mPlayerPresenter.pause();
-                    }else{
-                        mPlayerPresenter.play();
+        mPlayControlBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (mPlayerPresenter != null) {
+                    //判断播放器是否有播放列表.
+                    boolean has = mPlayerPresenter.hasPlayList();
+                    if (has) {
+                        //控制播放器的状态
+                        handlePlayList();
+                    } else {
+                        handleNoPlayList();
                     }
                 }
-            });
+            }
+        });
+    }
+
+    /**
+     * 当播放器没有播放列表，我们就要处理开始播放当前列表第一首
+     */
+    private void handleNoPlayList() {
+        mPlayerPresenter.setPlayerList(mCurrentTrack,DEFAULT_PLAY_POSITION);
+    }
+
+    private void handlePlayList() {
+        if (mPlayerPresenter.isPlaying()) {
+            //正在播放那么久暂停
+            mPlayerPresenter.pause();
+        }else{
+            mPlayerPresenter.play();
         }
     }
 
@@ -117,12 +152,13 @@ public class DetailActivity extends BaseActivity implements UILoader.OnRetryClic
         mAlbumAuthor = this.findViewById(R.id.tv_album_author);
         mPlayControlBtn = this.findViewById(R.id.detail_play_control);
         mPlayControlTips = this.findViewById(R.id.detail_play_control_tv);
-        mPlayControlContainerBtn = this.findViewById(R.id.detail_play_control_container);
+        mPlayControlTips.setSelected(true);
     }
 
     private View createSuccessView(ViewGroup container) {
         View detailListView = LayoutInflater.from(this).inflate(R.layout.item_detail_list, container, false);
         mDetailList = detailListView.findViewById(R.id.album_detail_list);
+        mRefreshLayout = detailListView.findViewById(R.id.refresh_layout);
         //RecycleView的使用步骤
         //第一步，设置布局管理器
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
@@ -142,11 +178,40 @@ public class DetailActivity extends BaseActivity implements UILoader.OnRetryClic
         });
 
         mDetailListAdapter.setItemClickListener(this);
+        BezierLayout headerView = new BezierLayout(this);
+        mRefreshLayout.setHeaderView(headerView);
+        mRefreshLayout.setMaxHeadHeight(140);
+        mRefreshLayout.setOnRefreshListener(new RefreshListenerAdapter() {
+            @Override
+            public void onRefresh(TwinklingRefreshLayout refreshLayout) {
+                super.onRefresh(refreshLayout);
+                BaseApplication.getsHandler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        mRefreshLayout.finishRefreshing();
+                    }
+                },2000);
+            }
+
+            @Override
+            public void onLoadMore(TwinklingRefreshLayout refreshLayout) {
+                super.onLoadMore(refreshLayout);
+                if (mAlbumDetailPresenter != null) {
+                    mAlbumDetailPresenter.loadMore();
+                    mIsLoaderMore = true;
+                }
+            }
+        });
         return detailListView;
     }
 
     @Override
     public void onDetailListLoaded(List<Track> tracks) {
+        if (mIsLoaderMore&&mRefreshLayout!=null) {
+            mRefreshLayout.finishLoadmore();
+            mIsLoaderMore = false;
+        }
+        this.mCurrentTrack = tracks;
         //判断更新结果，根据结果控制UI显示
         if(tracks==null||tracks.size()==0){
             if (mUiLoader != null) {
@@ -210,7 +275,7 @@ public class DetailActivity extends BaseActivity implements UILoader.OnRetryClic
         }
 
         if (mSmallCover != null) {
-            Glide.with(this).load(album.getCoverUrlLarge()).into(mSmallCover);
+            Picasso.get().load(album.getCoverUrlLarge()).into(mSmallCover);
         }
     }
 
@@ -235,7 +300,7 @@ public class DetailActivity extends BaseActivity implements UILoader.OnRetryClic
     @Override
     public void onPlayStart() {
         //修改图标为暂停的，文字修改为正在播放
-
+        updatePlayState(true);
     }
 
     @Override
@@ -246,8 +311,14 @@ public class DetailActivity extends BaseActivity implements UILoader.OnRetryClic
 
     private void updatePlayState(boolean playing) {
         if (mPlayControlBtn != null && mPlayControlTips != null) {
-            mPlayControlBtn.setImageResource(playing?R.drawable.selector_play_control_play:R.drawable.selector_play_control_play);
-            mPlayControlTips.setText(playing?R.string.playing_tips_text:R.string.pause_tips_text);
+            mPlayControlBtn.setImageResource(playing?R.drawable.selector_play_control_pause:R.drawable.selector_play_control_play);
+            if (!playing){
+                mPlayControlTips.setText(R.string.click_play_tips_text);
+            }else{
+                if (!TextUtils.isEmpty(mCurrentTrackTitle)) {
+                    mPlayControlTips.setText(mCurrentTrackTitle);
+                }
+            }
         }
     }
 
@@ -299,7 +370,12 @@ public class DetailActivity extends BaseActivity implements UILoader.OnRetryClic
 
     @Override
     public void onTrackUpdate(Track track, int playIndex) {
-
+        if (track != null) {
+            mCurrentTrackTitle = track.getTrackTitle();
+            if (!TextUtils.isEmpty(mCurrentTrackTitle) && mPlayControlTips != null) {
+                mPlayControlTips.setText(mCurrentTrackTitle);
+            }
+        }
     }
 
     @Override

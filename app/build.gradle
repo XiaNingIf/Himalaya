@@ -50,5 +50,6 @@ dependencies {
     androidTestImplementation 'androidx.test.ext:junit:1.1.1'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
     implementation project(':magicindicator')
+    implementation 'com.lcodecorex:tkrefreshlayout:1.0.7'
 
 }

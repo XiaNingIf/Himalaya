@@ -10,14 +10,14 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.bumptech.glide.Glide;
 import com.jit.himalaya.R;
+import com.squareup.picasso.Picasso;
 import com.ximalaya.ting.android.opensdk.model.album.Album;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class RecommendListAdapter extends RecyclerView.Adapter<RecommendListAdapter.InnerHolder> {
+public class AlbumListAdapter extends RecyclerView.Adapter<AlbumListAdapter.InnerHolder> {
     private  List<Album> mData = new ArrayList<>();
     private OnRecommendClickListener mItemClickListener = null;
 
@@ -84,7 +84,7 @@ public class RecommendListAdapter extends RecyclerView.Adapter<RecommendListAdap
 
             String coverUrlLarge = album.getCoverUrlLarge();
             if (!TextUtils.isEmpty(coverUrlLarge)) {
-                Glide.with(itemView.getContext()).load(album.getCoverUrlLarge()).into(albumCoverIv);
+                Picasso.get().load(album.getCoverUrlLarge()).into(albumCoverIv);
             }
 //            else {
 //                albumCoverIv.setImageResource(R.mipmap.ximalay_logo);
