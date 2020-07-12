@@ -15,10 +15,10 @@ public class FragmentCreator {
 
     public final static  int PAGE_COUNT = 3;
 
-    private  static Map<Integer, BaseFragment> sCacha = new HashMap<>();
+    private  static Map<Integer, BaseFragment> sCache = new HashMap<>();
 
     public static  BaseFragment getFragment(int index){
-        BaseFragment baseFragment = sCacha.get(index);
+        BaseFragment baseFragment = sCache.get(index);
         if(baseFragment != null){
             return baseFragment;
         }
@@ -28,11 +28,13 @@ public class FragmentCreator {
                         break;
             case INDEX_SUBSCRIPTION:
                 baseFragment = new SubscriptionFragment();
+                break;
             case INDEX_HISTORY:
                 baseFragment = new HistoryFragment();
+                break;
         }
 
-        sCacha.put(index,baseFragment);
+        sCache.put(index,baseFragment);
         return baseFragment;
 
     }

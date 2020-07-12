@@ -11,7 +11,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.jit.himalaya.adapters.IndicatorAdapter;
-import com.jit.himalaya.adapters.MainCotentAdapter;
+import com.jit.himalaya.adapters.MainContentAdapter;
 import com.jit.himalaya.interfaces.IPlayerCallback;
 import com.jit.himalaya.presenters.PlayerPresenter;
 import com.jit.himalaya.presenters.RecommendPresenter;
@@ -60,8 +60,9 @@ public class MainActivity extends FragmentActivity implements IPlayerCallback {
         mIndicatorAdapter.setOnIndicatorTapClickListener(new IndicatorAdapter.OnIndicatorTapClickListener() {
             @Override
             public void onTabClick(int index) {
-                if (mContentPager != null) {
-                    mContentPager.setCurrentItem(index);
+                LogUtil.d(TAG,"click index is -- > " + index);
+                if(mContentPager != null) {
+                    mContentPager.setCurrentItem(index,false);
                 }
             }
         });
@@ -69,47 +70,48 @@ public class MainActivity extends FragmentActivity implements IPlayerCallback {
         mPlayControl.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (mPlayerPresenter != null) {
+                if(mPlayerPresenter != null) {
                     boolean hasPlayList = mPlayerPresenter.hasPlayList();
-                    if (!hasPlayList) {
-                        //没有设置播放列表，就播放第一个推荐专辑
+                    if(!hasPlayList) {
+                        //没有设置过播放列表，我们就播放默认的第一个推荐专辑
+                        //第一个推荐专辑，每天都会变的。
                         playFirstRecommend();
-                    }else{
-                        if (mPlayerPresenter.isPlaying()) {
+                    } else {
+                        if(mPlayerPresenter.isPlaying()) {
                             mPlayerPresenter.pause();
-                        }else{
+                        } else {
                             mPlayerPresenter.play();
                         }
                     }
                 }
             }
         });
-
         mPlayControlItem.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //跳转到播放器界面
                 boolean hasPlayList = mPlayerPresenter.hasPlayList();
-                if (!hasPlayList) {
+                if(!hasPlayList) {
                     playFirstRecommend();
                 }
+                //跳转到播放器界面
                 startActivity(new Intent(MainActivity.this,PlayerActivity.class));
             }
         });
-
         mSearchBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(MainActivity.this,SearchActivity.class);
-                LogUtil.e(TAG,"mSearchBtn");
                 startActivity(intent);
             }
         });
     }
 
+    /**
+     * 播放第一个推荐的内容.
+     */
     private void playFirstRecommend() {
         List<Album> currentRecommend = RecommendPresenter.getInstance().getCurrentRecommend();
-        if (currentRecommend != null&&currentRecommend.size()>0) {
+        if(currentRecommend != null && currentRecommend.size() > 0) {
             Album album = currentRecommend.get(0);
             long albumId = album.getId();
             mPlayerPresenter.playByAlbumId(albumId);
@@ -125,20 +127,19 @@ public class MainActivity extends FragmentActivity implements IPlayerCallback {
         commonNavigator.setAdjustMode(true);
         commonNavigator.setAdapter(mIndicatorAdapter);
 
-
         //ViewPager
         mContentPager = this.findViewById(R.id.content_page);
 
         //创建内容适配器
-        FragmentManager supportFragmentManger = getSupportFragmentManager();
-        MainCotentAdapter mainCotentAdapter = new MainCotentAdapter(supportFragmentManger,1);
-        mContentPager.setAdapter(mainCotentAdapter);
+        FragmentManager supportFragmentManager = getSupportFragmentManager();
+        MainContentAdapter mainContentAdapter = new MainContentAdapter(supportFragmentManager,0);
 
-        //把ViewPager和indicator相联
+        mContentPager.setAdapter(mainContentAdapter);
+        //把ViewPager和indicator绑定到一起。
         mMagicIndicator.setNavigator(commonNavigator);
         ViewPagerHelper.bind(mMagicIndicator,mContentPager);
 
-        //控制播放相关的
+        //播放控制相关的
         mRoundRectImageView = this.findViewById(R.id.main_track_cover);
         mHeaderTitle = this.findViewById(R.id.main_head_title);
         mHeaderTitle.setSelected(true);
@@ -149,10 +150,11 @@ public class MainActivity extends FragmentActivity implements IPlayerCallback {
         mSearchBtn = this.findViewById(R.id.search_btn);
     }
 
+
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if (mPlayerPresenter != null) {
+        if(mPlayerPresenter != null) {
             mPlayerPresenter.unRegisterViewCallback(this);
         }
     }
@@ -162,9 +164,9 @@ public class MainActivity extends FragmentActivity implements IPlayerCallback {
         updatePlayControl(true);
     }
 
-    private void updatePlayControl(boolean isPlaying){
-        if (mPlayControl != null) {
-            mPlayControl.setImageResource(isPlaying?R.drawable.selector_player_stop:R.drawable.selector_player_play);
+    private void updatePlayControl(boolean isPlaying) {
+        if(mPlayControl != null) {
+            mPlayControl.setImageResource(isPlaying ? R.drawable.selector_player_stop : R.drawable.selector_player_play);
         }
     }
 
@@ -204,7 +206,7 @@ public class MainActivity extends FragmentActivity implements IPlayerCallback {
     }
 
     @Override
-    public void onProgressChange(int currentProgress, int total) {
+    public void onProgressChange(int currentProgress,int total) {
 
     }
 
@@ -219,18 +221,21 @@ public class MainActivity extends FragmentActivity implements IPlayerCallback {
     }
 
     @Override
-    public void onTrackUpdate(Track track, int playIndex) {
-        if (track != null) {
+    public void onTrackUpdate(Track track,int playIndex) {
+        if(track != null) {
             String trackTitle = track.getTrackTitle();
             String nickname = track.getAnnouncer().getNickname();
-            String coverUrlLarge = track.getCoverUrlLarge();
-            if (mHeaderTitle != null) {
+            String coverUrlMiddle = track.getCoverUrlMiddle();
+            LogUtil.d(TAG,"trackTitle -- > " + trackTitle);
+            if(mHeaderTitle != null) {
                 mHeaderTitle.setText(trackTitle);
             }
-            if (mSubTitle != null) {
+            LogUtil.d(TAG,"nickname -- > " + nickname);
+            if(mSubTitle != null) {
                 mSubTitle.setText(nickname);
             }
-            Picasso.get().load(coverUrlLarge).into(mRoundRectImageView);
+            LogUtil.d(TAG,"coverUrlMiddle -- > " + coverUrlMiddle);
+            Picasso.get().load(coverUrlMiddle).into(mRoundRectImageView);
         }
     }
 

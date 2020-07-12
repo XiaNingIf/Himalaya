@@ -85,15 +85,21 @@ public abstract class UILoader extends FrameLayout {
             mEmptyView = getEmptyView();
             addView(mEmptyView);
         }
+
+        //数据为空的界面
+        if (mEmptyView == null) {
+            mEmptyView = getEmptyView();
+            addView(mEmptyView);
+        }
         //根据状态设置是否可见
         mEmptyView.setVisibility(mCurrentStatus == UIStatus.EMPTY ?VISIBLE:GONE);
     }
 
-    private View getEmptyView() {
-        return LayoutInflater.from(getContext()).inflate(R.layout.fragment_empty_view,this,false);
+    protected View getEmptyView() {
+        return LayoutInflater.from(getContext()).inflate(R.layout.fragment_empty_view, this, false);
     }
 
-    private View getNetworkErrorView() {
+    protected View getNetworkErrorView() {
         View networkErrorView = LayoutInflater.from(getContext()).inflate(R.layout.fragment_error_view,this,false);
         networkErrorView.findViewById(R.id.network_error_icon).setOnClickListener(new OnClickListener() {
             @Override
@@ -108,7 +114,7 @@ public abstract class UILoader extends FrameLayout {
 
     protected abstract View getSuccessView(ViewGroup container);
 
-    private View getLoadingView() {
+    protected View getLoadingView() {
         return LayoutInflater.from(getContext()).inflate(R.layout.fragment_loading_view,this,false);
     }
 

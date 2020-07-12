@@ -1,21 +1,16 @@
 package com.jit.himalaya.presenters;
 
-import com.jit.himalaya.api.XimalayaApi;
+import com.jit.himalaya.data.XimalayaApi;
 import com.jit.himalaya.interfaces.IAlbumDetailPresenter;
 import com.jit.himalaya.interfaces.IAlbumDetailViewCallback;
-import com.jit.himalaya.utils.Constants;
 import com.jit.himalaya.utils.LogUtil;
-import com.ximalaya.ting.android.opensdk.constants.DTransferConstants;
-import com.ximalaya.ting.android.opensdk.datatrasfer.CommonRequest;
 import com.ximalaya.ting.android.opensdk.datatrasfer.IDataCallBack;
 import com.ximalaya.ting.android.opensdk.model.album.Album;
 import com.ximalaya.ting.android.opensdk.model.track.Track;
 import com.ximalaya.ting.android.opensdk.model.track.TrackList;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class AlbumDetailPresenter implements IAlbumDetailPresenter {
 

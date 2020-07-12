@@ -3,7 +3,7 @@ package com.jit.himalaya.presenters;
 import android.content.Context;
 import android.content.SharedPreferences;
 
-import com.jit.himalaya.api.XimalayaApi;
+import com.jit.himalaya.data.XimalayaApi;
 import com.jit.himalaya.base.BaseApplication;
 import com.jit.himalaya.interfaces.IPlayerCallback;
 import com.jit.himalaya.interfaces.IPlayerPresenter;
@@ -248,6 +248,11 @@ public class PlayerPresenter implements IPlayerPresenter, IXmAdsStatusListener, 
 
     @Override
     public void registerViewCallback(IPlayerCallback iPlayerCallback) {
+        if (!mCallback.contains(iPlayerCallback) ) {
+            mCallback.add(iPlayerCallback);
+        }
+        //更新之前先让UI的有page
+        getPlayList();
         iPlayerCallback.onTrackUpdate(mCurrentTrack,mCurrentIndex);
         iPlayerCallback.onProgressChange(mCurrentProgressPosition,mProgressDuration);
         //更新状态
@@ -255,9 +260,6 @@ public class PlayerPresenter implements IPlayerPresenter, IXmAdsStatusListener, 
         int modelIndex = mPlayModeSp.getInt(PLAY_MODE_SP_KEY, PLAY_MODEL_LIST_INT);
         mCurrentPlayMode = getModeByInt(modelIndex);
         iPlayerCallback.onPlayModeChange(mCurrentPlayMode);
-        if (!mCallback.contains(iPlayerCallback) ) {
-            mCallback.add(iPlayerCallback);
-        }
     }
 
     private void handlePlayState(IPlayerCallback iPlayerCallback) {
