@@ -27,7 +27,7 @@ public interface IHistoryPresenter extends IBasePresenter<IHistoryCallback> {
     /**
      * 清除历史
      */
-    void cleanHistory();
+    void cleanHistories();
 
 
 }

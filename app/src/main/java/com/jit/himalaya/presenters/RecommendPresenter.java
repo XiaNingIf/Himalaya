@@ -17,6 +17,7 @@ public class RecommendPresenter implements IRecommendPresenter {
 
     private List<IRecommendViewCallback> mCallbacks = new ArrayList<>();
     private List<Album> mCurrentRecommend = null;
+    private List<Album> mRecommendList;
 
     private RecommendPresenter(){}
 
@@ -44,7 +45,12 @@ public class RecommendPresenter implements IRecommendPresenter {
 
     @Override
     public void getRecommendList() {
-        getRecommendData();
+        //如果内容不空的话，那么直接使用当前的内容
+        if(mRecommendList != null && mRecommendList.size() > 0) {
+            LogUtil.d(TAG,"getRecommendList -- > from list.");
+            handlerRecommendResult(mRecommendList);
+            return;
+        }getRecommendData();
     }
 
 
@@ -87,6 +93,7 @@ public class RecommendPresenter implements IRecommendPresenter {
                     List<Album> albumList = gussLikeAlbumList.getAlbumList();
                     if(albumList!=null){
                         LogUtil.e(TAG,"size---->"+albumList.size());
+                        mRecommendList = gussLikeAlbumList.getAlbumList();
 //                        upRecommendUI(albumList);
                         handlerRecommendResult(albumList);
                     }

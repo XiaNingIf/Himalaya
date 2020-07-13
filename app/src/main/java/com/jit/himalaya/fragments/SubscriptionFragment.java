@@ -33,7 +33,7 @@ import java.util.List;
 
 public class SubscriptionFragment extends BaseFragment implements ISubscriptionCallback, AlbumListAdapter.OnRecommendClickListener, AlbumListAdapter.OnAlbumItemLongClickListener, ConfirmDialog.OnDialogActionClickListener {
 
-    private ISubscriptionPresenter mSubscriptionPresenter;
+    private SubscriptionPresenter mSubscriptionPresenter;
     private RecyclerView mSubListView;
     private AlbumListAdapter mAlbumListAdapter;
     private Album mCurrentClickAlbum = null;

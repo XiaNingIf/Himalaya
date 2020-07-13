@@ -45,10 +45,12 @@ public class SubscriptionPresenter implements ISubscriptionPresenter, ISubDaoCal
 
     private static SubscriptionPresenter sInstance = null;
 
-    public static ISubscriptionPresenter getInstance() {
+    public static SubscriptionPresenter getInstance() {
         if (sInstance == null) {
             synchronized (SubscriptionPresenter.class) {
-                sInstance = new SubscriptionPresenter();
+                if(sInstance == null) {
+                    sInstance = new SubscriptionPresenter();
+                }
             }
         }
         return sInstance;

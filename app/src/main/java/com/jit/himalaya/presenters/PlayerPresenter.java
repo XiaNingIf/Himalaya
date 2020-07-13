@@ -360,7 +360,13 @@ public class PlayerPresenter implements IPlayerPresenter, IXmAdsStatusListener, 
 
     @Override
     public void onSoundSwitch(PlayableModel lastModel, PlayableModel curModel) {
-        LogUtil.e(TAG,"onSoundSwitch");
+        LogUtil.d(TAG,"onSoundSwitch...");
+        if(lastModel != null) {
+            LogUtil.d(TAG,"lastModel..." + lastModel.getKind());
+        }
+        if(curModel != null) {
+            LogUtil.d(TAG,"curModel..." + curModel.getKind());
+        }
         //curModel代表的是当前播放的内容
         //通过getKind方法来获取他是什么类型
         //track类型
@@ -371,7 +377,11 @@ public class PlayerPresenter implements IPlayerPresenter, IXmAdsStatusListener, 
         //第二种写法
         mCurrentIndex = mPlayerManager.getCurrentIndex();
         if (curModel instanceof Track) {
-            mCurrentTrack = (Track)curModel;
+            Track currentTrack = (Track) curModel;
+            mCurrentTrack = currentTrack;
+            //保存播放记录
+            HistoryPresenter historyPresenter = HistoryPresenter.getHistoryPresenter();
+            historyPresenter.addHistory(currentTrack);
             //更新UI
             for (IPlayerCallback iPlayerCallback : mCallback) {
                 iPlayerCallback.onTrackUpdate(mCurrentTrack,mCurrentIndex);
@@ -417,6 +427,17 @@ public class PlayerPresenter implements IPlayerPresenter, IXmAdsStatusListener, 
      */
     public boolean hasPlayList() {
         return isPlayListSet;
+    }
+
+    public void setPlayList(List<Track> list,int playIndex) {
+        if(mPlayerManager != null) {
+            mPlayerManager.setPlayList(list,playIndex);
+            isPlayListSet = true;
+            mCurrentTrack = list.get(playIndex);
+            mCurrentIndex = playIndex;
+        } else {
+            LogUtil.d(TAG,"mPlayerManager is null");
+        }
     }
 
     //===============播放器相关的回调 end======================
